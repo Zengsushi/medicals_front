@@ -1,0 +1,1033 @@
+<template>
+  <div class="permission-manage">
+    <div class="content">
+      <a-tabs v-model:activeKey="activeTab">
+        <a-tab-pane key="permissions" tab="权限管理">
+          <div class="tab-content">
+            <div class="header-actions">
+              <div class="search-box">
+                <a-input-search
+                  v-model:value="searchKey"
+                  placeholder="搜索权限名称或代码..."
+                  enter-button
+                  size="large"
+                  @search="handleSearch"
+                />
+              </div>
+              <div class="search-filters">
+                <a-select
+                  v-model:value="filterModule"
+                  placeholder="按模块筛选"
+                  style="width: 180px"
+                  allow-clear
+                  @change="handleSearch"
+                >
+                  <a-select-option value="">全部模块</a-select-option>
+                  <a-select-option 
+                    v-for="mod in uniqueModules" 
+                    :key="mod" 
+                    :value="mod"
+                  >
+                    {{ mod }}
+                  </a-select-option>
+                </a-select>
+
+                <a-select
+                  v-model:value="filterStatus"
+                  placeholder="状态筛选"
+                  style="width: 120px"
+                  allow-clear
+                  @change="handleSearch"
+                >
+                  <a-select-option value="">全部状态</a-select-option>
+                  <a-select-option value="true">启用</a-select-option>
+                  <a-select-option value="false">禁用</a-select-option>
+                </a-select>
+              </div>
+              <div class="action-buttons">
+                <a-button @click="handleRefresh" :loading="loading">
+                  <template #icon><ReloadOutlined /></template>
+                  刷新
+                </a-button>
+                <a-button type="primary" @click="handleAddPermission">
+                  <template #icon><PlusOutlined /></template>
+                  新增权限
+                </a-button>
+              </div>
+            </div>
+
+            <a-table
+              :columns="columns"
+              :data-source="filteredPermissions"
+              :loading="loading"
+              row-key="id"
+              :pagination="{
+                current: pagination.current,
+                pageSize: pagination.pageSize,
+                total: filteredPermissions.length,
+                showSizeChanger: true,
+                showQuickJumper: true,
+                showTotal: (total) => `共 ${total} 条权限`
+              }"
+              :scroll="{ x: 900 }"
+              @change="handleTableChange"
+            >
+              <template #bodyCell="{ column, record }">
+                <template v-if="column.key === 'name'">
+                  <div class="permission-name-cell">
+                    <span class="name">{{ record.name }}</span>
+                    <span class="code">{{ record.code }}</span>
+                  </div>
+                </template>
+
+                <template v-if="column.key === 'status'">
+                  <a-tag :color="record.is_active ? 'green' : 'red'">
+                    {{ record.is_active ? "启用" : "禁用" }}
+                  </a-tag>
+                </template>
+
+                <template v-if="column.key === 'created_at'">
+                  {{ formatDate(record.created_at) }}
+                </template>
+
+                <template v-if="column.key === 'actions'">
+                  <a-space>
+                    <a-tooltip title="编辑">
+                      <a-button 
+                        type="link" 
+                        size="small" 
+                        @click="handleEditPermission(record)"
+                      >
+                        <template #icon><EditOutlined /></template>
+                      </a-button>
+                    </a-tooltip>
+                    
+                    <a-popconfirm
+                      :title="record.is_active ? '确定禁用该权限？' : '确定启用该权限？'"
+                      ok-text="确定"
+                      cancel-text="取消"
+                      @confirm="handleTogglePermission(record)"
+                    >
+                      <a-tooltip :title="record.is_active ? '禁用' : '启用'">
+                        <a-button type="link" size="small">
+                          <template v-if="record.is_active"><CloseCircleOutlined /></template>
+                          <template v-else><CheckCircleOutlined /></template>
+                        </a-button>
+                      </a-tooltip>
+                    </a-popconfirm>
+                    
+                    <a-popconfirm
+                      title="确定删除此权限吗？关联的菜单可能会受影响！"
+                      @confirm="handleDeletePermission(record.id)"
+                      ok-text="删除"
+                      cancel-text="取消"
+                      ok-type="danger"
+                    >
+                      <a-tooltip title="删除">
+                        <a-button 
+                          type="link" 
+                          size="small" 
+                          danger
+                        >
+                          <template #icon><DeleteOutlined /></template>
+                        </a-button>
+                      </a-tooltip>
+                    </a-popconfirm>
+                  </a-space>
+                </template>
+              </template>
+            </a-table>
+
+            <a-empty v-if="filteredPermissions.length === 0 && !loading" description="暂无权限数据">
+              <a-button type="primary" @click="handleAddPermission">立即创建</a-button>
+            </a-empty>
+          </div>
+        </a-tab-pane>
+
+        <a-tab-pane key="user-permissions" tab="用户权限管理">
+          <div class="tab-content">
+            <div class="header-actions">
+              <div class="search-box">
+                <a-input-search
+                  v-model:value="leftKeyword"
+                  placeholder="搜索普通用户..."
+                  enter-button
+                  size="large"
+                  @search="fetchUsers"
+                />
+              </div>
+              <div class="action-buttons">
+                <a-button @click="fetchUsers" :loading="userLoading">
+                  <template #icon><ReloadOutlined /></template>
+                  刷新
+                </a-button>
+              </div>
+            </div>
+
+            <a-card class="user-permission-card" :loading="userLoading">
+              <div class="user-transfer-wrapper">
+                <div class="transfer-panel">
+                  <div class="panel-header">
+                    <h3>普通用户</h3>
+                    <a-input-search
+                      v-model:value="leftKeyword"
+                      placeholder="搜索用户"
+                      style="width: 200px"
+                      allow-clear
+                    />
+                  </div>
+                  <div class="panel-actions">
+                    <a-checkbox 
+                      :checked="isAllLeftSelected" 
+                      @change="toggleSelectAllLeft"
+                    >
+                      全选
+                    </a-checkbox>
+                    <span>{{ selectedLeft.length }} 已选</span>
+                  </div>
+                  <a-list
+                    :data-source="filteredLeftUsers"
+                    :locale="{ emptyText: '暂无普通用户' }"
+                    class="user-list"
+                  >
+                    <template #renderItem="{ item }">
+                      <a-list-item>
+                        <a-checkbox
+                          :checked="selectedLeft.includes(item.id)"
+                          :disabled="item.is_superuser"
+                          @change="(e) => toggleUserSelection('left', item.id, e.target.checked)"
+                        >
+                          <a-avatar :size="32" :src="item.avatar || defaultAvatar" />
+                          <span class="user-info">
+                            <span class="username">
+                              {{ item.username }}
+                              <a-tag v-if="item.is_superuser" color="red" style="margin-left: 8px">系统管理员</a-tag>
+                            </span>
+                            <span class="email">{{ item.email || '-' }}</span>
+                          </span>
+                        </a-checkbox>
+                      </a-list-item>
+                    </template>
+                  </a-list>
+                </div>
+
+                <div class="transfer-buttons">
+                  <a-button 
+                    type="primary" 
+                    shape="circle"
+                    :disabled="selectedLeft.length === 0"
+                    :loading="userSaving"
+                    @click="moveToAdmin"
+                  >
+                    <RightOutlined />
+                  </a-button>
+                  <a-button 
+                    shape="circle"
+                    :disabled="selectedRight.length === 0"
+                    :loading="userSaving"
+                    @click="moveToUser"
+                  >
+                    <LeftOutlined />
+                  </a-button>
+                </div>
+
+                <div class="transfer-panel">
+                  <div class="panel-header">
+                    <h3>管理员用户</h3>
+                    <a-input-search
+                      v-model:value="rightKeyword"
+                      placeholder="搜索用户"
+                      style="width: 200px"
+                      allow-clear
+                    />
+                  </div>
+                  <div class="panel-actions">
+                    <a-checkbox 
+                      :checked="isAllRightSelected" 
+                      @change="toggleSelectAllRight"
+                    >
+                      全选
+                    </a-checkbox>
+                    <span>{{ selectedRight.length }} 已选</span>
+                  </div>
+                  <a-list
+                    :data-source="filteredRightUsers"
+                    :locale="{ emptyText: '暂无管理员用户' }"
+                    class="user-list"
+                  >
+                    <template #renderItem="{ item }">
+                      <a-list-item>
+                        <a-checkbox
+                          :checked="selectedRight.includes(item.id)"
+                          :disabled="item.is_superuser"
+                          @change="(e) => toggleUserSelection('right', item.id, e.target.checked)"
+                        >
+                          <a-avatar :size="32" :src="item.avatar || defaultAvatar" />
+                          <span class="user-info">
+                            <span class="username">
+                              {{ item.username }}
+                              <a-tag v-if="item.is_superuser" color="red" style="margin-left: 8px">系统管理员</a-tag>
+                            </span>
+                            <span class="email">{{ item.email || '-' }}</span>
+                          </span>
+                        </a-checkbox>
+                      </a-list-item>
+                    </template>
+                  </a-list>
+                </div>
+              </div>
+            </a-card>
+          </div>
+        </a-tab-pane>
+
+        <a-tab-pane key="menu-permissions" tab="菜单权限管理">
+          <div class="tab-content">
+            <div class="header-actions">
+              <div class="action-buttons">
+                <a-button @click="fetchMenus" :loading="menuLoading">
+                  <template #icon><ReloadOutlined /></template>
+                  刷新菜单
+                </a-button>
+              </div>
+            </div>
+
+            <a-card class="menu-permission-card" :loading="menuLoading">
+              <div class="menu-permission-info">
+                <a-alert
+                  message="菜单权限管理说明"
+                  description="此功能用于配置菜单与角色的权限关系。由于后端接口尚未完善，当前仅展示菜单结构。"
+                  type="info"
+                  show-icon
+                  style="margin-bottom: 24px"
+                />
+                
+                <a-empty description="菜单权限管理功能开发中...">
+                  <template #image>
+                    <MenuOutlined style="font-size: 64px; color: #d9d9d9" />
+                  </template>
+                </a-empty>
+              </div>
+            </a-card>
+          </div>
+        </a-tab-pane>
+      </a-tabs>
+
+      <a-modal
+        v-model:open="modalVisible"
+        :title="isEdit ? '✏️ 编辑权限' : '➕ 新增权限'"
+        :width="550"
+        :destroy-on-close="true"
+        @ok="handleSubmit"
+        @cancel="handleCancel"
+        ok-text="保存"
+        cancel-text="取消"
+      >
+        <a-form
+          ref="formRef"
+          :model="form"
+          :rules="rules"
+          layout="vertical"
+        >
+          <a-form-item label="权限名称" name="name">
+            <a-input 
+              v-model:value="form.name" 
+              placeholder="例如：查看用户列表"
+              :maxlength="50"
+              show-count
+            />
+          </a-form-item>
+
+          <a-form-item label="权限代码" name="code">
+            <a-input 
+              v-model:value="form.code" 
+              placeholder="例如：users:view"
+              :maxlength="100"
+              show-count
+            >
+              <template #prefix>
+                <span style="color: #999">:</span>
+              </template>
+            </a-input>
+            <div class="form-tip">建议格式：模块:操作，如 users:view, menu:create</div>
+          </a-form-item>
+
+          <a-form-item label="所属模块" name="module">
+            <a-input 
+              v-model:value="form.module" 
+              placeholder="例如：users、menu、system"
+              :maxlength="30"
+            />
+          </a-form-item>
+
+          <a-form-item label="描述说明" name="description">
+            <a-textarea 
+              v-model:value="form.description" 
+              placeholder="详细描述此权限的作用范围和使用场景"
+              :rows="3"
+              :maxlength="200"
+              show-count
+            />
+          </a-form-item>
+
+          <a-form-item label="状态" name="is_active">
+            <a-switch 
+              v-model:checked="form.is_active" 
+              checked-children="启用" 
+              un-checked-children="禁用"
+            />
+          </a-form-item>
+        </a-form>
+      </a-modal>
+    </div>
+  </div>
+</template>
+
+<script setup>
+import { ref, reactive, computed, onMounted } from 'vue';
+import { 
+  PlusOutlined, 
+  EditOutlined, 
+  DeleteOutlined, 
+  ReloadOutlined,
+  RightOutlined,
+  LeftOutlined,
+  MenuOutlined,
+  CloseCircleOutlined,
+  CheckCircleOutlined
+} from '@ant-design/icons-vue';
+import { message } from 'ant-design-vue';
+import permissionAPI from '../../api/permission';
+import { userAPI } from '../../api/users';
+import { useErrorHandler } from '../../composables/useErrorHandler';
+import { formatDate } from '../../utils/dateUtil';
+
+const { handleAsync } = useErrorHandler({ showNotification: true });
+
+const activeTab = ref('permissions');
+const defaultAvatar = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48cmVjdCB3aWR0aD0iMTAwIiBoZWlnaHQ9IjEwMCIgZmlsbD0iI2U1ZTdlOSIvPjxjaXJjbGUgY3g9IjUwIiBjeT0iNDAiIHI9IjIwIiBmaWxsPSIjOWVhM2FiIi8+PHBhdGggZD0iTTIwIDg1IGMwIC0yNSAyNSAtNDAgMzAgLTQwIGMxMCAwIDMwIDE1IDMwIDQwIGwwIDAiIGZpbGw9IiM5ZWEzYWIiLz48L3N2Zz4=';
+
+const loading = ref(false);
+const permissions = ref([]);
+const searchKey = ref('');
+const filterModule = ref('');
+const filterStatus = ref('');
+const modalVisible = ref(false);
+const isEdit = ref(false);
+const formRef = ref(null);
+
+const form = reactive({
+  id: null,
+  name: '',
+  code: '',
+  module: '',
+  description: '',
+  is_active: true
+});
+
+const rules = {
+  name: [
+    { required: true, message: '请输入权限名称', trigger: 'blur' },
+    { max: 50, message: '不能超过50个字符', trigger: 'blur' }
+  ],
+  code: [
+    { required: true, message: '请输入权限代码', trigger: 'blur' }
+  ]
+};
+
+const pagination = reactive({
+  current: 1,
+  pageSize: 15
+});
+
+const columns = [
+  {
+    title: '权限信息',
+    key: 'name',
+    width: 300,
+    fixed: 'left'
+  },
+  {
+    title: '所属模块',
+    dataIndex: 'module',
+    key: 'module',
+    width: 120
+  },
+  {
+    title: '描述',
+    dataIndex: 'description',
+    key: 'description',
+    ellipsis: true
+  },
+  {
+    title: '状态',
+    key: 'status',
+    width: 90,
+    align: 'center'
+  },
+  {
+    title: '创建时间',
+    key: 'created_at',
+    width: 170,
+    sorter: (a, b) => new Date(a.created_at) - new Date(b.created_at)
+  },
+  {
+    title: '操作',
+    key: 'actions',
+    width: 120,
+    align: 'center',
+    fixed: 'right'
+  }
+];
+
+const filteredPermissions = computed(() => {
+  let result = [...permissions.value];
+  
+  if (searchKey.value) {
+    const keyword = searchKey.value.toLowerCase();
+    result = result.filter(p => 
+      p.name?.toLowerCase().includes(keyword) ||
+      p.code?.toLowerCase().includes(keyword)
+    );
+  }
+  
+  if (filterModule.value) {
+    result = result.filter(p => p.module === filterModule.value);
+  }
+  
+  if (filterStatus.value !== '') {
+    const isActive = filterStatus.value === 'true';
+    result = result.filter(p => p.is_active === isActive);
+  }
+  
+  return result;
+});
+
+const uniqueModules = computed(() => {
+  return [...new Set(permissions.value.map(p => p.module).filter(Boolean))].sort();
+});
+
+const userLoading = ref(false);
+const userSaving = ref(false);
+const normalUsers = ref([]);
+const adminUsers = ref([]);
+const selectedLeft = ref([]);
+const selectedRight = ref([]);
+const leftKeyword = ref('');
+const rightKeyword = ref('');
+
+const filteredLeftUsers = computed(() => {
+  if (!leftKeyword.value) return normalUsers.value;
+  const kw = leftKeyword.value.toLowerCase();
+  return normalUsers.value.filter(
+    u => u.username?.toLowerCase().includes(kw) || u.email?.toLowerCase().includes(kw)
+  );
+});
+
+const filteredRightUsers = computed(() => {
+  if (!rightKeyword.value) return adminUsers.value;
+  const kw = rightKeyword.value.toLowerCase();
+  return adminUsers.value.filter(
+    u => u.username?.toLowerCase().includes(kw) || u.email?.toLowerCase().includes(kw)
+  );
+});
+
+const isAllLeftSelected = computed(() => {
+  return filteredLeftUsers.value.length > 0 && 
+         filteredLeftUsers.value.every(u => selectedLeft.value.includes(u.id));
+});
+
+const isAllRightSelected = computed(() => {
+  return filteredRightUsers.value.length > 0 && 
+         filteredRightUsers.value.every(u => selectedRight.value.includes(u.id));
+});
+
+const menuLoading = ref(false);
+
+const loadPermissions = async () => {
+  loading.value = true;
+  
+  try {
+    const result = await handleAsync(
+      () => permissionAPI.getAllPermissions(),
+      { showSuccess: false }
+    );
+
+    // 处理两种数据格式：
+    // 1. handleAsync 返回 { success, data, error }，其中 data 是 API 完整响应
+    // 2. API 完整响应格式: { success, code, message, data: [...] }
+    let apiData = result;
+    if (result.data && result.data.success !== undefined) {
+      apiData = result.data;
+    }
+    
+    if (apiData.success && apiData.code === 200) {
+      permissions.value = apiData.data || [];
+    }
+  } catch (error) {
+    console.error('[PermissionManage] 加载失败:', error);
+  } finally {
+    loading.value = false;
+  }
+};
+
+const fetchUsers = async () => {
+  userLoading.value = true;
+  try {
+    const res = await userAPI.get_user_list({ page: 1, page_size: 1000 });
+    if (res?.success && res?.code === 200 && res?.data?.user_list) {
+      const users = res.data.user_list;
+      normalUsers.value = users.filter(u => !u.is_staff && !u.is_superuser);
+      adminUsers.value = users.filter(u => u.is_staff || u.is_superuser);
+      
+      // 系统管理员不能被选中，移除已选择的系统管理员
+      selectedLeft.value = selectedLeft.value.filter(id => {
+        const user = users.find(u => u.id === id);
+        return user && !user.is_superuser;
+      });
+      
+      selectedRight.value = selectedRight.value.filter(id => {
+        const user = users.find(u => u.id === id);
+        return user && !user.is_superuser;
+      });
+    }
+  } catch (error) {
+    console.error('获取用户列表失败:', error);
+  } finally {
+    userLoading.value = false;
+  }
+};
+
+const fetchMenus = async () => {
+  menuLoading.value = true;
+  try {
+    await new Promise(resolve => setTimeout(resolve, 500));
+  } finally {
+    menuLoading.value = false;
+  }
+};
+
+const toggleUserSelection = (side, id, checked) => {
+  const selected = side === 'left' ? selectedLeft : selectedRight;
+  if (checked) {
+    if (!selected.value.includes(id)) {
+      selected.value.push(id);
+    }
+  } else {
+    const index = selected.value.indexOf(id);
+    if (index > -1) {
+      selected.value.splice(index, 1);
+    }
+  }
+};
+
+const toggleSelectAllLeft = (e) => {
+  if (e.target.checked) {
+    selectedLeft.value = filteredLeftUsers.value.map(u => u.id);
+  } else {
+    selectedLeft.value = [];
+  }
+};
+
+const toggleSelectAllRight = (e) => {
+  if (e.target.checked) {
+    selectedRight.value = filteredRightUsers.value.map(u => u.id);
+  } else {
+    selectedRight.value = [];
+  }
+};
+
+const moveToAdmin = async () => {
+  if (selectedLeft.value.length === 0) {
+    message.warning('请先选择要升级的用户');
+    return;
+  }
+  userSaving.value = true;
+  let successCount = 0;
+  let failCount = 0;
+  
+  try {
+    for (const id of selectedLeft.value) {
+      try {
+        const res = await userAPI.update_user_permissions(id, {
+          role: 'admin',
+          permissions: []
+        });
+        
+        if (res?.success && res?.code === 200) {
+          successCount++;
+        } else {
+          failCount++;
+        }
+      } catch (err) {
+        failCount++;
+        console.error(`升级用户 ${id} 异常:`, err);
+      }
+    }
+    
+    if (successCount > 0) {
+      message.success(`成功升级 ${successCount} 个用户`);
+    }
+    if (failCount > 0) {
+      message.warning(`${failCount} 个用户升级失败`);
+    }
+    
+    selectedLeft.value = [];
+    await fetchUsers();
+  } catch (error) {
+    console.error('移动用户失败:', error);
+    message.error('移动用户失败');
+  } finally {
+    userSaving.value = false;
+  }
+};
+
+const moveToUser = async () => {
+  if (selectedRight.value.length === 0) {
+    message.warning('请先选择要降级的用户');
+    return;
+  }
+  userSaving.value = true;
+  let successCount = 0;
+  let failCount = 0;
+  
+  try {
+    for (const id of selectedRight.value) {
+      try {
+        const res = await userAPI.update_user_permissions(id, {
+          role: 'user',
+          permissions: []
+        });
+        
+        if (res?.success && res?.code === 200) {
+          successCount++;
+        } else {
+          failCount++;
+        }
+      } catch (err) {
+        failCount++;
+        console.error(`降级用户 ${id} 异常:`, err);
+      }
+    }
+    
+    if (successCount > 0) {
+      message.success(`成功降级 ${successCount} 个用户`);
+    }
+    if (failCount > 0) {
+      message.warning(`${failCount} 个用户降级失败`);
+    }
+    
+    selectedRight.value = [];
+    await fetchUsers();
+  } catch (error) {
+    console.error('移动用户失败:', error);
+    message.error('移动用户失败');
+  } finally {
+    userSaving.value = false;
+  }
+};
+
+const handleRefresh = async () => {
+  await loadPermissions();
+};
+
+const handleSearch = () => {
+  pagination.current = 1;
+};
+
+const handleTableChange = (pag) => {
+  pagination.current = pag.current;
+  pagination.pageSize = pag.pageSize;
+};
+
+const handleAddPermission = () => {
+  isEdit.value = false;
+  resetForm();
+  modalVisible.value = true;
+};
+
+const handleEditPermission = (record) => {
+  isEdit.value = true;
+  Object.assign(form, {
+    id: record.id,
+    name: record.name || '',
+    code: record.code || '',
+    module: record.module || '',
+    description: record.description || '',
+    is_active: record.is_active ?? true
+  });
+  modalVisible.value = true;
+};
+
+const handleSubmit = async () => {
+  try {
+    await formRef.value?.validate();
+    
+    const submitData = { ...form };
+    
+    let result;
+    if (isEdit.value) {
+      result = await permissionAPI.updatePermission(form.id, submitData);
+    } else {
+      result = await permissionAPI.createPermission(submitData);
+    }
+    
+    if (result.data.code === 200) {
+      message.success(isEdit.value ? '✅ 权限更新成功' : '✅ 权限创建成功');
+      modalVisible.value = false;
+      resetForm();
+      await loadPermissions();
+    } else {
+      message.error(result.data.message || (isEdit.value ? '更新失败' : '创建失败'));
+    }
+  } catch (error) {
+    if (error.message !== 'Validation failed') {
+      message.error('操作失败：' + error.message);
+    }
+  }
+};
+
+const handleTogglePermission = async (permission) => {
+  // 先临时更新UI状态，提升体验
+  const originalStatus = permission.is_active;
+  permission.is_active = !originalStatus;
+  
+  try {
+    const result = await permissionAPI.togglePermission(permission.id);
+    if (result?.success && result?.code === 200) {
+      message.success(!originalStatus ? '🟢 权限启用成功' : '🔴 权限禁用成功');
+    } else {
+      // 如果失败，回滚状态
+      permission.is_active = originalStatus;
+      message.error(result?.data?.message || '操作失败');
+    }
+  } catch (error) {
+    // 如果失败，回滚状态
+    permission.is_active = originalStatus;
+    message.error('操作失败：' + error.message);
+  }
+};
+
+const handleDeletePermission = async (id) => {
+  try {
+    const result = await permissionAPI.deletePermission(id);
+    if (result.data.code === 200) {
+      message.success('🗑️ 权限删除成功');
+      await loadPermissions();
+    } else {
+      message.error(result.data.message || '删除失败');
+    }
+  } catch (error) {
+    message.error('删除失败：' + error.message);
+  }
+};
+
+const handleCancel = () => {
+  modalVisible.value = false;
+  resetForm();
+};
+
+const resetForm = () => {
+  Object.assign(form, {
+    id: null,
+    name: '',
+    code: '',
+    module: '',
+    description: '',
+    is_active: true
+  });
+  formRef.value?.resetFields();
+};
+
+onMounted(async () => {
+  await loadPermissions();
+  await fetchUsers();
+});
+</script>
+
+<style scoped lang="less">
+.permission-manage {
+  width: 100%;
+  padding: 0;
+}
+
+.content {
+  width: 100%;
+  padding: 24px;
+  background: #f0f2f5;
+  min-height: 600px;
+}
+
+.tab-content {
+  .header-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    background: #fff;
+    padding: 20px 24px;
+    border-radius: 4px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  }
+
+  .search-box {
+    max-width: 320px;
+    flex-shrink: 0;
+  }
+
+  .search-filters {
+    display: flex;
+    gap: 12px;
+    flex: 1;
+    justify-content: center;
+  }
+
+  .action-buttons {
+    display: flex;
+    gap: 12px;
+  }
+}
+
+.user-permission-card,
+.menu-permission-card {
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.permission-name-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  .name {
+    font-weight: 500;
+    color: #1a1a1a;
+  }
+
+  .code {
+    font-size: 12px;
+    font-family: monospace;
+    color: #1890ff;
+    background: #e6f7ff;
+    padding: 2px 8px;
+    border-radius: 4px;
+    display: inline-block;
+    width: fit-content;
+  }
+}
+
+.form-tip {
+  margin-top: 4px;
+  color: #999;
+  font-size: 12px;
+}
+
+.user-transfer-wrapper {
+  display: flex;
+  gap: 24px;
+  align-items: stretch;
+}
+
+.transfer-panel {
+  flex: 1;
+  border: 1px solid #f0f0f0;
+  border-radius: 4px;
+  overflow: hidden;
+
+  .panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 16px;
+    background: #fafafa;
+    border-bottom: 1px solid #f0f0f0;
+
+    h3 {
+      margin: 0;
+      font-size: 16px;
+      color: #1a1a1a;
+    }
+  }
+
+  .panel-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 16px;
+    border-bottom: 1px solid #f0f0f0;
+    font-size: 14px;
+    color: #666;
+  }
+
+  .user-list {
+    max-height: 500px;
+    overflow-y: auto;
+
+    :deep(.ant-list-item) {
+      padding: 12px 16px;
+    }
+
+    .user-info {
+      display: flex;
+      flex-direction: column;
+      margin-left: 12px;
+
+      .username {
+        font-size: 14px;
+        font-weight: 500;
+        color: #1a1a1a;
+      }
+
+      .email {
+        font-size: 12px;
+        color: #999;
+      }
+    }
+  }
+}
+
+.transfer-buttons {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 16px;
+  padding: 0 8px;
+}
+
+.menu-permission-info {
+  padding: 20px 0;
+}
+
+@media (max-width: 768px) {
+  .tab-content {
+    .header-actions {
+      flex-direction: column;
+      gap: 16px;
+      align-items: stretch;
+    }
+    
+    .search-box {
+      max-width: 100%;
+    }
+    
+    .search-filters {
+      flex-wrap: wrap;
+    }
+    
+    .action-buttons {
+      justify-content: center;
+    }
+  }
+  
+  .content {
+    padding: 16px;
+  }
+  
+  .user-transfer-wrapper {
+    flex-direction: column;
+  }
+  
+  .transfer-buttons {
+    flex-direction: row;
+  }
+}
+</style>

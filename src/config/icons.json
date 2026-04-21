@@ -1,0 +1,249 @@
+{
+  "_comment": "图标映射配置文件",
+  "_description": "此文件定义图标名称与 Ant Design Icons 的映射关系，支持动态图标加载",
+  "_generation": "此文件由 build/scripts/generate-icons.js 自动生成，请勿手动修改",
+  "version": "1.0.0",
+  "lastUpdated": "2026-04-07T00:00:00.000Z",
+
+  "iconMap": {
+    "HomeOutlined": {
+      "component": "HomeOutlined",
+      "category": "navigation",
+      "tags": ["home", "首页"]
+    },
+    "UserOutlined": {
+      "component": "UserOutlined",
+      "category": "user",
+      "tags": ["user", "用户"]
+    },
+    "TeamOutlined": {
+      "component": "TeamOutlined",
+      "category": "user",
+      "tags": ["team", "group", "团队", "分组"]
+    },
+    "DashboardOutlined": {
+      "component": "DashboardOutlined",
+      "category": "navigation",
+      "tags": ["dashboard", "admin", "仪表盘", "管理"]
+    },
+    "UnorderedListOutlined": {
+      "component": "UnorderedListOutlined",
+      "category": "navigation",
+      "tags": ["list", "列表"]
+    },
+    "PlusOutlined": {
+      "component": "PlusOutlined",
+      "category": "action",
+      "tags": ["add", "create", "新增", "添加"]
+    },
+    "SafetyCertificateOutlined": {
+      "component": "SafetyCertificateOutlined",
+      "category": "user",
+      "tags": ["auth", "authorize", "授权", "安全"]
+    },
+    "FileTextOutlined": {
+      "component": "FileTextOutlined",
+      "category": "document",
+      "tags": ["detail", "文件", "详情"]
+    },
+    "BookOutlined": {
+      "component": "BookOutlined",
+      "category": "data",
+      "tags": ["dict", "dictionary", "字典"]
+    },
+    "DatabaseOutlined": {
+      "component": "DatabaseOutlined",
+      "category": "data",
+      "tags": ["source", "database", "数据源"]
+    },
+    "BarChartOutlined": {
+      "component": "BarChartOutlined",
+      "category": "visualization",
+      "tags": ["chart", "visual", "bar", "图表", "可视化"]
+    },
+    "PieChartOutlined": {
+      "component": "PieChartOutlined",
+      "category": "visualization",
+      "tags": ["pie", "chart", "饼图"]
+    },
+    "LineChartOutlined": {
+      "component": "LineChartOutlined",
+      "category": "visualization",
+      "tags": ["line", "chart", "趋势", "折线图"]
+    },
+    "SettingOutlined": {
+      "component": "SettingOutlined",
+      "category": "action",
+      "tags": ["setting", "设置"]
+    },
+    "LogoutOutlined": {
+      "component": "LogoutOutlined",
+      "category": "action",
+      "tags": ["logout", "exit", "退出"]
+    },
+    "LoginOutlined": {
+      "component": "LoginOutlined",
+      "category": "action",
+      "tags": ["login", "登录"]
+    },
+    "MenuOutlined": {
+      "component": "MenuOutlined",
+      "category": "navigation",
+      "tags": ["menu", "菜案"]
+    },
+    "CrownOutlined": {
+      "component": "CrownOutlined",
+      "category": "user",
+      "tags": ["admin", "crown", "管理员"]
+    },
+    "StockOutlined": {
+      "component": "StockOutlined",
+      "category": "visualization",
+      "tags": ["stock", "医疗"]
+    },
+    "MonitorOutlined": {
+      "component": "MonitorOutlined",
+      "category": "device",
+      "tags": ["monitor", "screen", "屏幕"]
+    },
+    "QuestionCircleOutlined": {
+      "component": "QuestionCircleOutlined",
+      "category": "action",
+      "tags": ["help", "question", "帮助", "问号"]
+    },
+    "BellOutlined": {
+      "component": "BellOutlined",
+      "category": "notification",
+      "tags": ["bell", "notification", "通知", "铃声"]
+    },
+    "LockOutlined": {
+      "component": "LockOutlined",
+      "category": "security",
+      "tags": ["lock", "password", "密码", "锁"]
+    },
+    "KeyOutlined": {
+      "component": "KeyOutlined",
+      "category": "security",
+      "tags": ["key", "密码"]
+    },
+    "EyeOutlined": {
+      "component": "EyeOutlined",
+      "category": "action",
+      "tags": ["eye", "view", "查看"]
+    },
+    "EyeInvisibleOutlined": {
+      "component": "EyeInvisibleOutlined",
+      "category": "action",
+      "tags": ["eye", "hide", "隐藏"]
+    },
+    "FormOutlined": {
+      "component": "FormOutlined",
+      "category": "document",
+      "tags": ["form", "表单"]
+    },
+    "TableOutlined": {
+      "component": "TableOutlined",
+      "category": "data",
+      "tags": ["table", "表格"]
+    },
+    "SaveOutlined": {
+      "component": "SaveOutlined",
+      "category": "action",
+      "tags": ["save", "保存"]
+    },
+    "DeleteOutlined": {
+      "component": "DeleteOutlined",
+      "category": "action",
+      "tags": ["delete", "remove", "删除", "移除"]
+    },
+    "EditOutlined": {
+      "component": "EditOutlined",
+      "category": "action",
+      "tags": ["edit", "修改", "编辑"]
+    },
+    "SearchOutlined": {
+      "component": "SearchOutlined",
+      "category": "action",
+      "tags": ["search", "查找", "搜索"]
+    },
+    "ReloadOutlined": {
+      "component": "ReloadOutlined",
+      "category": "action",
+      "tags": ["reload", "refresh", "刷新", "重载"]
+    },
+    "LeftOutlined": {
+      "component": "LeftOutlined",
+      "category": "navigation",
+      "tags": ["left", "back", "左", "返回"]
+    },
+    "RightOutlined": {
+      "component": "RightOutlined",
+      "category": "navigation",
+      "tags": ["right", "右"]
+    },
+    "UpOutlined": {
+      "component": "UpOutlined",
+      "category": "navigation",
+      "tags": ["up", "上"]
+    },
+    "DownOutlined": {
+      "component": "DownOutlined",
+      "category": "navigation",
+      "tags": ["down", "下"]
+    },
+    "ArrowLeftOutlined": {
+      "component": "ArrowLeftOutlined",
+      "category": "navigation",
+      "tags": ["arrow", "left", "箭头", "左"]
+    },
+    "ArrowRightOutlined": {
+      "component": "ArrowRightOutlined",
+      "category": "navigation",
+      "tags": ["arrow", "right", "箭头", "右"]
+    },
+    "CheckCircleOutlined": {
+      "component": "CheckCircleOutlined",
+      "category": "status",
+      "tags": ["check", "success", "完成", "成功"]
+    },
+    "CloseCircleOutlined": {
+      "component": "CloseCircleOutlined",
+      "category": "status",
+      "tags": ["close", "error", "错误", "失败"]
+    },
+    "ExclamationCircleOutlined": {
+      "component": "ExclamationCircleOutlined",
+      "category": "status",
+      "tags": ["warning", "exclamation", "警告"]
+    },
+    "InfoCircleOutlined": {
+      "component": "InfoCircleOutlined",
+      "category": "status",
+      "tags": ["info", "information", "信息"]
+    },
+    "LayoutFilled": {
+      "component": "LayoutFilled",
+      "category": "layout",
+      "tags": ["layout", "布局"]
+    },
+    "FundOutlined": {
+      "component": "FundOutlined",
+      "category": "visualization",
+      "tags": ["fund", "chart", "资金", "图表"]
+    }
+  },
+
+  "categoryGroups": {
+    "navigation": ["HomeOutlined", "DashboardOutlined", "MenuOutlined", "LeftOutlined", "RightOutlined", "UpOutlined", "DownOutlined", "ArrowLeftOutlined", "ArrowRightOutlined"],
+    "user": ["UserOutlined", "TeamOutlined", "SafetyCertificateOutlined", "CrownOutlined"],
+    "action": ["PlusOutlined", "SettingOutlined", "LogoutOutlined", "LoginOutlined", "DeleteOutlined", "EditOutlined", "SearchOutlined", "ReloadOutlined", "EyeOutlined", "EyeInvisibleOutlined", "QuestionCircleOutlined"],
+    "data": ["BookOutlined", "DatabaseOutlined", "TableOutlined", "FileTextOutlined"],
+    "visualization": ["BarChartOutlined", "PieChartOutlined", "LineChartOutlined", "StockOutlined", "FundOutlined"],
+    "document": ["FormOutlined", "FileTextOutlined"],
+    "status": ["CheckCircleOutlined", "CloseCircleOutlined", "ExclamationCircleOutlined", "InfoCircleOutlined"],
+    "security": ["LockOutlined", "KeyOutlined"],
+    "notification": ["BellOutlined"],
+    "device": ["MonitorOutlined"],
+    "layout": ["LayoutFilled"]
+  }
+}

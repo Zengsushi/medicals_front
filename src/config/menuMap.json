@@ -1,0 +1,445 @@
+{
+  "_comment": "路由 - 菜单映射配置文件",
+  "_description": "此文件定义前端路由与后端菜单的映射关系，用于动态路由注入和菜单权限控制",
+  "_generation": "此文件由 build/scripts/generate-menu-map.js 自动生成，请勿手动修改",
+  "version": "3.0.0",
+  "lastUpdated": "2026-04-14T00:00:00.000Z",
+
+  "routeMenuMap": {
+    "/": {
+      "menuId": 1,
+      "parentId": null,
+      "name": "首页",
+      "permission": "visuals:view",
+      "keepAlive": false,
+      "icon": "HomeOutlined",
+      "component": "views/visual/Large.vue"
+    },
+    "/admin/home": {
+      "menuId": 2,
+      "parentId": null,
+      "name": "管理首页",
+      "permission": "admins:view",
+      "keepAlive": true,
+      "icon": "DashboardOutlined",
+      "component": "views/admin/adminHome.vue"
+    },
+    "/user/manage": {
+      "menuId": 3,
+      "parentId": null,
+      "name": "用户管理",
+      "permission": "users:view",
+      "keepAlive": true,
+      "icon": "UserOutlined",
+      "component": "views/user/UserManage.vue"
+    },
+    "/user/manage/list": {
+      "menuId": 4,
+      "parentId": 3,
+      "name": "用户列表",
+      "permission": "users:view",
+      "keepAlive": true,
+      "icon": "UnorderedListOutlined",
+      "component": "views/user/UserList.vue"
+    },
+    "/user/manage/add": {
+      "menuId": 5,
+      "parentId": 3,
+      "name": "新增用户",
+      "permission": "users:create",
+      "keepAlive": false,
+      "icon": "PlusOutlined",
+      "component": "views/user/UserAdd.vue"
+    },
+    "/user/manage/auth": {
+      "menuId": 6,
+      "parentId": 3,
+      "name": "用户授权",
+      "permission": "users:authorize",
+      "keepAlive": false,
+      "icon": "SafetyCertificateOutlined",
+      "component": "views/user/UserAuth.vue"
+    },
+    "/user/manage/group": {
+      "menuId": 7,
+      "parentId": 3,
+      "name": "用户分组",
+      "permission": "users:view",
+      "keepAlive": false,
+      "icon": "TeamOutlined",
+      "component": "views/user/UserGroupManage.vue"
+    },
+    "/user/manage/detail": {
+      "menuId": 8,
+      "parentId": 3,
+      "name": "用户详情",
+      "permission": "users:view",
+      "keepAlive": false,
+      "icon": "FileTextOutlined",
+      "component": "views/user/UserProfile.vue"
+    },
+    "/admin/settings": {
+      "menuId": 9,
+      "parentId": null,
+      "name": "系统设置",
+      "permission": "menus:view",
+      "keepAlive": false,
+      "icon": "SettingOutlined",
+      "component": "views/admin/MenuTreeManage.vue"
+    },
+    "/admin/settings/menus": {
+      "menuId": 10,
+      "parentId": 9,
+      "name": "菜单树管理",
+      "permission": "menus:view",
+      "keepAlive": false,
+      "icon": "MenuOutlined",
+      "component": "views/admin/MenuTreeManage.vue"
+    },
+    "/admin/settings/permission-list": {
+      "menuId": 11,
+      "parentId": 9,
+      "name": "权限列表",
+      "permission": "permissions:view",
+      "keepAlive": false,
+      "icon": "LockOutlined",
+      "component": "views/admin/PermissionList.vue"
+    },
+    "/admin/settings/user-permission": {
+      "menuId": 12,
+      "parentId": 9,
+      "name": "用户权限管理",
+      "permission": "users:authorize",
+      "keepAlive": false,
+      "icon": "UserSwitchOutlined",
+      "component": "views/admin/UserPermissionManage.vue"
+    },
+    "/admin/settings/menu-permission": {
+      "menuId": 13,
+      "parentId": 9,
+      "name": "菜单权限管理",
+      "permission": "menus:view",
+      "keepAlive": false,
+      "icon": "AppstoreOutlined",
+      "component": "views/admin/MenuPermissionManage.vue"
+    },
+    "/admin/dict": {
+      "menuId": 14,
+      "parentId": null,
+      "name": "字典管理",
+      "permission": "dicts:view",
+      "keepAlive": true,
+      "icon": "BookOutlined",
+      "component": "views/admin/adminDictManage.vue"
+    },
+    "/admin/dict/category": {
+      "menuId": 15,
+      "parentId": 14,
+      "name": "字典分类",
+      "permission": "dicts:view",
+      "keepAlive": false,
+      "icon": "FolderOpenOutlined",
+      "component": "views/admin/adminDictCategoryList.vue"
+    },
+    "/admin/dict/list": {
+      "menuId": 16,
+      "parentId": 14,
+      "name": "字典列表",
+      "permission": "dicts:view",
+      "keepAlive": false,
+      "icon": "UnorderedListOutlined",
+      "component": "views/admin/adminDictList.vue"
+    },
+    "/admin/dict/diction": {
+      "menuId": 17,
+      "parentId": 14,
+      "name": "字典项列表",
+      "permission": "dicts:view",
+      "keepAlive": false,
+      "icon": "TagsOutlined",
+      "component": "views/admin/adminDictionList.vue"
+    },
+    "/database/manage": {
+      "menuId": 18,
+      "parentId": 37,
+      "name": "Hive源管理",
+      "permission": "sources:view",
+      "keepAlive": true,
+      "icon": "DatabaseOutlined",
+      "component": "views/database/SourceManage.vue"
+    },
+    "/database/mysql": {
+      "menuId": 38,
+      "parentId": 37,
+      "name": "MySQL源管理",
+      "permission": "sources:view",
+      "keepAlive": true,
+      "icon": "MySQLOutlined",
+      "component": "views/database/SourceManage.vue"
+    },
+    "/database/metadata": {
+      "menuId": 39,
+      "parentId": 37,
+      "name": "元数据管理",
+      "permission": "sources:view",
+      "keepAlive": true,
+      "icon": " ApartmentOutlined",
+      "component": "views/database/SourceManage.vue"
+    },
+    "/database": {
+      "menuId": 37,
+      "parentId": null,
+      "name": "数据源管理",
+      "permission": "sources:view",
+      "keepAlive": false,
+      "icon": "DatabaseOutlined",
+      "component": null
+    },
+    "/database/sync": {
+      "menuId": 19,
+      "parentId": 37,
+      "name": "数据同步",
+      "permission": "sync:view",
+      "keepAlive": false,
+      "icon": "SyncOutlined",
+      "component": "views/sync/DataSyncEnhanced.vue"
+    },
+    "/cluster/manage": {
+      "menuId": 20,
+      "parentId": null,
+      "name": "集群管理",
+      "permission": "clusters:view",
+      "keepAlive": false,
+      "icon": "CloudServerOutlined",
+      "component": "views/cluster/ClusterManage.vue"
+    },
+    "/analysis": {
+      "menuId": 21,
+      "parentId": null,
+      "name": "数据分析",
+      "permission": "analyse:view",
+      "keepAlive": false,
+      "icon": "BarChartOutlined",
+      "component": "views/analysis/Overview.vue"
+    },
+    "/analysis/overview": {
+      "menuId": 22,
+      "parentId": 21,
+      "name": "数据概览",
+      "permission": "analyse:view",
+      "keepAlive": false,
+      "icon": "DashboardOutlined",
+      "component": "views/analysis/Overview.vue"
+    },
+    "/analysis/disease": {
+      "menuId": 23,
+      "parentId": 21,
+      "name": "疾病分析",
+      "permission": "analyse:view",
+      "keepAlive": false,
+      "icon": "MedicineBoxOutlined",
+      "component": "views/analysis/DiseaseAnalysis.vue"
+    },
+    "/analysis/consultation-trend": {
+      "menuId": 24,
+      "parentId": 21,
+      "name": "问诊趋势",
+      "permission": "analyse:view",
+      "keepAlive": false,
+      "icon": "LineChartOutlined",
+      "component": "views/analysis/ConsultationTrend.vue"
+    },
+    "/analysis/satisfaction": {
+      "menuId": 25,
+      "parentId": 21,
+      "name": "满意度分析",
+      "permission": "analyse:view",
+      "keepAlive": false,
+      "icon": "SmileOutlined",
+      "component": "views/analysis/SatisfactionAnalysis.vue"
+    },
+    "/analysis/hospital-ranking": {
+      "menuId": 26,
+      "parentId": 21,
+      "name": "医院排名",
+      "permission": "analyse:view",
+      "keepAlive": false,
+      "icon": "TrophyOutlined",
+      "component": "views/analysis/HospitalRanking.vue"
+    },
+    "/analysis/doctor-ranking": {
+      "menuId": 27,
+      "parentId": 21,
+      "name": "医生排名",
+      "permission": "analyse:view",
+      "keepAlive": false,
+      "icon": "UserOutlined",
+      "component": "views/analysis/DoctorRanking.vue"
+    },
+    "/analysis/hospital-level": {
+      "menuId": 28,
+      "parentId": 21,
+      "name": "医院等级分析",
+      "permission": "analyse:view",
+      "keepAlive": false,
+      "icon": "BuildOutlined",
+      "component": "views/analysis/HospitalLevelAnalysis.vue"
+    },
+    "/analysis/doctor-title": {
+      "menuId": 29,
+      "parentId": 21,
+      "name": "医生职称分析",
+      "permission": "analyse:view",
+      "keepAlive": false,
+      "icon": "IdcardOutlined",
+      "component": "views/analysis/DoctorTitleAnalysis.vue"
+    },
+    "/analysis/department-service": {
+      "menuId": 30,
+      "parentId": 21,
+      "name": "科室服务分析",
+      "permission": "analyse:view",
+      "keepAlive": false,
+      "icon": "ApartmentOutlined",
+      "component": "views/analysis/DepartmentServiceAnalysis.vue"
+    },
+    "/analysis/price-range": {
+      "menuId": 31,
+      "parentId": 21,
+      "name": "价格区间分析",
+      "permission": "analyse:view",
+      "keepAlive": false,
+      "icon": "DollarOutlined",
+      "component": "views/analysis/PriceRangeAnalysis.vue"
+    },
+    "/analysis/city-medical": {
+      "menuId": 32,
+      "parentId": 21,
+      "name": "城市医疗对比",
+      "permission": "analyse:view",
+      "keepAlive": false,
+      "icon": "EnvironmentOutlined",
+      "component": "views/analysis/CityMedicalComparison.vue"
+    },
+    "/analysis/region-resource": {
+      "menuId": 33,
+      "parentId": 21,
+      "name": "区域医疗资源",
+      "permission": "analyse:view",
+      "keepAlive": false,
+      "icon": "GlobalOutlined",
+      "component": "views/analysis/RegionMedicalResource.vue"
+    },
+    "/visual/large": {
+      "menuId": 34,
+      "parentId": null,
+      "name": "可视化大屏",
+      "permission": "visuals:large",
+      "keepAlive": false,
+      "icon": "BarChartOutlined",
+      "component": "views/visual/Large.vue"
+    },
+    "/visual/monitor": {
+      "menuId": 35,
+      "parentId": null,
+      "name": "系统监控",
+      "permission": "clusters:view",
+      "keepAlive": false,
+      "icon": "EyeOutlined",
+      "component": "views/monitor/SystemMonitor.vue"
+    },
+    "/model/menu": {
+      "menuId": 36,
+      "parentId": null,
+      "name": "模型菜单",
+      "permission": "admins:view",
+      "keepAlive": false,
+      "icon": "AppstoreOutlined",
+      "component": "views/model/Menu.vue"
+    },
+    "/login": {
+      "menuId": null,
+      "parentId": null,
+      "name": "登录页",
+      "permission": null,
+      "keepAlive": false,
+      "isPublic": true,
+      "icon": null,
+      "component": "views/user/UserLogin.vue"
+    },
+    "/404": {
+      "menuId": null,
+      "parentId": null,
+      "name": "页面不存在",
+      "permission": null,
+      "keepAlive": false,
+      "isPublic": true,
+      "icon": null,
+      "component": "views/user/UserHome.vue"
+    }
+  },
+
+  "menuRouteMap": {
+    "1": {"path": "/", "permission": "visuals:view"},
+    "2": {"path": "/admin/home", "permission": "admins:view"},
+    "3": {"path": "/user/manage", "permission": "users:view"},
+    "4": {"path": "/user/manage/list", "permission": "users:view"},
+    "5": {"path": "/user/manage/add", "permission": "users:create"},
+    "6": {"path": "/user/manage/auth", "permission": "users:authorize"},
+    "7": {"path": "/user/manage/group", "permission": "users:view"},
+    "8": {"path": "/user/manage/detail", "permission": "users:view"},
+    "9": {"path": "/admin/settings", "permission": "menus:view"},
+    "10": {"path": "/admin/settings/menus", "permission": "menus:view"},
+    "11": {"path": "/admin/settings/permission-list", "permission": "permissions:view"},
+    "12": {"path": "/admin/settings/user-permission", "permission": "users:authorize"},
+    "13": {"path": "/admin/settings/menu-permission", "permission": "menus:view"},
+    "14": {"path": "/admin/dict", "permission": "dicts:view"},
+    "15": {"path": "/admin/dict/category", "permission": "dicts:view"},
+    "16": {"path": "/admin/dict/list", "permission": "dicts:view"},
+    "17": {"path": "/admin/dict/diction", "permission": "dicts:view"},
+    "18": {"path": "/database/manage", "permission": "sources:view"},
+    "37": {"path": "/database", "permission": "sources:view"},
+    "38": {"path": "/database/mysql", "permission": "sources:view"},
+    "39": {"path": "/database/metadata", "permission": "sources:view"},
+    "19": {"path": "/database/sync", "permission": "sync:view"},
+    "20": {"path": "/cluster/manage", "permission": "clusters:view"},
+    "21": {"path": "/analysis", "permission": "analyse:view"},
+    "22": {"path": "/analysis/overview", "permission": "analyse:view"},
+    "23": {"path": "/analysis/disease", "permission": "analyse:view"},
+    "24": {"path": "/analysis/consultation-trend", "permission": "analyse:view"},
+    "25": {"path": "/analysis/satisfaction", "permission": "analyse:view"},
+    "26": {"path": "/analysis/hospital-ranking", "permission": "analyse:view"},
+    "27": {"path": "/analysis/doctor-ranking", "permission": "analyse:view"},
+    "28": {"path": "/analysis/hospital-level", "permission": "analyse:view"},
+    "29": {"path": "/analysis/doctor-title", "permission": "analyse:view"},
+    "30": {"path": "/analysis/department-service", "permission": "analyse:view"},
+    "31": {"path": "/analysis/price-range", "permission": "analyse:view"},
+    "32": {"path": "/analysis/city-medical", "permission": "analyse:view"},
+    "33": {"path": "/analysis/region-resource", "permission": "analyse:view"},
+    "34": {"path": "/visual/large", "permission": "visuals:large"},
+    "35": {"path": "/visual/monitor", "permission": "clusters:view"},
+    "36": {"path": "/model/menu", "permission": "admins:view"}
+  },
+
+  "permissionModules": {
+    "users": ["view", "create", "update", "delete", "authorize", "resetpwd"],
+    "roles": ["view", "create", "update", "delete"],
+    "permissions": ["view", "create", "update", "delete"],
+    "menus": ["view", "create", "update", "delete"],
+    "dicts": ["view", "create", "update", "delete"],
+    "sources": ["view", "create", "update", "delete"],
+    "sync": ["view", "create", "update", "delete", "execute"],
+    "clusters": ["view", "create", "update", "delete"],
+    "analyse": ["view", "query"],
+    "visuals": ["view", "large", "export"],
+    "admins": ["view", "manage"]
+  },
+
+  "keepAliveRoutes": [
+    "/",
+    "/admin/home",
+    "/user/manage",
+    "/admin/dict",
+    "/database/manage"
+  ]
+}

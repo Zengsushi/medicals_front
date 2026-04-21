@@ -1,0 +1,679 @@
+/**
+ * ============================================================================
+ * 医疗大屏视觉定位系统 (Visual Positioning System)
+ * ============================================================================
+ * 
+ * 设计理念：
+ * 1. 语义化布局令牌 (Semantic Layout Tokens) - 清晰的层级关系
+ * 2. 无障碍优先 (Accessibility First) - WCAG 2.1 AA 合规
+ * 3. 主题无关 (Theme Agnostic) - 支持深色/浅色/打印模式
+ * 4. 键盘友好 (Keyboard Friendly) - 完整的焦点管理
+ * 
+ * 使用方式：
+ * ```less
+ * @import './layout-tokens.less';
+ * 
+ * .my-component {
+ *   z-index: var(--layer-content);
+ * }
+ * ```
+ */
+
+// ============================================================================
+// 🎨 Section 1: 视觉层级令牌 (Z-Index Layer Tokens)
+// ============================================================================
+
+:root {
+  /**
+   * 层级说明：
+   * --layer-header:     页面头部导航（始终在最上层）
+   * --layer-content:    主内容区（默认层级）
+   * --layer-overlay:    弹窗、遮罩层、Loading
+   * --layer-floating:   浮动按钮、Toast通知、Tooltip
+   */
+  
+  /* 核心视觉层级 */
+  --layer-header: 100;
+  --layer-content: 1;
+  --layer-overlay: 999;
+  --layer-floating: 1000;
+
+  /* 细分层级 */
+  --layer-header-sticky: 101;        // 固定头部
+  --layer-dropdown: 998;             // 下拉菜单
+  --layer-modal-backdrop: 997;      // 模态框背景
+  --layer-modal: 999;                // 模态框内容
+  --layer-popover: 1000;            // 弹出框
+  --layer-tooltip: 1001;            // 工具提示
+  --layer-notification: 1002;       // 通知消息
+  --layer-debug: 9999;              // 调试工具（开发用）
+}
+
+// ============================================================================
+// 🎯 Section 2: 语义化区域标识 (Semantic Area Identifiers)
+// ============================================================================
+
+/**
+ * ARIA 区域角色映射表：
+ * 
+ * 区域类型          | HTML元素 | role 属性           | aria-label
+ * ----------------|----------|---------------------|-------------
+ * 页面头部         | header    | banner               | "页面头部"
+ * 导航栏           | nav       | navigation           | "主导航"
+ * 统计数据区       | section   | region               | "统计数据区"
+ * 图表可视化区     | section   | region               | "图表可视化区"
+ * 资源监控区       | section   | region               | "资源监控区"
+ * 预警信息区       | aside     | complementary        | "预警信息区"
+ * 页脚             | footer    | contentinfo          | "页面底部"
+ */
+
+/* 语义化基础类 */
+.area-header {
+  position: relative;
+  z-index: var(--layer-header);
+}
+
+.area-nav {
+  position: relative;
+  z-index: var(--layer-header);
+}
+
+.area-stats {
+  position: relative;
+  z-index: var(--layer-content);
+}
+
+.area-chart {
+  position: relative;
+  z-index: var(--layer-content);
+}
+
+.area-gauge {
+  position: relative;
+  z-index: var(--layer-content);
+}
+
+.area-warning {
+  position: relative;
+  z-index: var(--layer-content);
+}
+
+.area-overlay {
+  position: relative;
+  z-index: var(--layer-overlay);
+}
+
+.area-floating {
+  position: relative;
+  z-index: var(--layer-floating);
+}
+
+// ============================================================================
+// ♿ Section 3: 无障碍访问性增强 (Accessibility Enhancements)
+// ============================================================================
+
+/**
+ * WCAG 2.1 AA 合规要点：
+ * 
+ * 1.4.3 对比度最低 4.5:1 (正文), 3:1 (大字)
+ * 2.1.1 键盘可访问所有功能
+ * 2.4.7 焦点可见
+ * 2.5.3 目标尺寸 ≥ 44×44px
+ * 4.1.2 名称、角色值可编程确定
+ */
+
+/* 焦点可见性 (Focus Visible) - 支持 Tab 键盘导航 */
+.focus-visible() {
+  &:focus {
+    outline: 2px solid var(--color-focus-ring, #4fc3ff);
+    outline-offset: 2px;
+    border-radius: 4px;
+    
+    /* 不使用默认的 outline */
+    outline-style: solid;
+  }
+
+  &:focus:not(:focus-visible) {
+    outline: none;
+  }
+}
+
+/* 跳过导航链接 (Skip Navigation) */
+.skip-link {
+  position: absolute;
+  top: -40px;
+  left: 0;
+  background: var(--color-primary, #000);
+  color: var(--color-on-primary, #fff);
+  padding: 8px 16px;
+  text-decoration: none;
+  border-radius: 0 0 8px 8px;
+  z-index: var(--layer-floating);
+  transition: top 0.2s ease-in-out;
+  
+  &:focus {
+    top: 0;
+  }
+}
+
+/* 屏幕阅读器专用文本 (Screen Reader Only) */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+.sr-only-focusable:focus,
+.sr-only-focusable:active {
+  position: static;
+  width: auto;
+  height: auto;
+  overflow: visible;
+  clip: auto;
+  white-space: normal;
+}
+
+/* 减少动画偏好 (Reduced Motion) */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* 高对比度模式适配 */
+@media (prefers-contrast: high) {
+  :root {
+    --border-color-default: #ffffff;
+    --text-color-primary: #ffffff;
+    --bg-color-default: #000000;
+  }
+  
+  .panel {
+    border: 2px solid #fff;
+  }
+  
+  .stat-card,
+  .chart-container {
+    border: 2px solid currentColor;
+  }
+}
+
+// ============================================================================
+// 🎨 Section 4: 主题变量系统 (Theme Variable System)
+// ============================================================================
+
+/**
+ * 主题切换机制：
+ * 
+ * [data-theme="dark"]  → 深色主题（医疗大屏默认）
+ * [data-theme="light"] → 浅色主题（日间模式）
+ * [data-theme="print"] → 打印优化
+ * @media print         → 打印样式激活
+ */
+
+:root,
+[data-theme="dark"] {
+  /* === 深色主题（默认） === */
+  
+  /* 背景颜色 */
+  --color-bg-primary: radial-gradient(circle at top, #0b3d91, #020b2d);
+  --color-bg-secondary: rgba(255, 255, 255, 0.05);
+  --color-bg-tertiary: rgba(255, 255, 255, 0.08);
+  --color-bg-panel: rgba(11, 61, 145, 0.6);
+  --color-bg-hover: rgba(255, 255, 255, 0.12);
+  
+  /* 文本颜色 */
+  --color-text-primary: #ffffff;
+  --color-text-secondary: rgba(255, 255, 255, 0.8);
+  --color-text-muted: rgba(255, 255, 255, 0.5);
+  --color-text-disabled: rgba(255, 255, 255, 0.3);
+  
+  /* 边框颜色 */
+  --color-border-default: rgba(255, 255, 255, 0.15);
+  --color-border-light: rgba(255, 255, 255, 0.08);
+  --color-border-focus: #4fc3ff;
+  
+  /* 强调色 */
+  --color-primary: #4fc3ff;
+  --color-success: #91cc75;
+  --color-warning: #fac858;
+  --color-danger: #ee6666;
+  --color-info: #73c0de;
+  
+  /* 阴影 */
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.2);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.25);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.3);
+  --shadow-glow: 0 0 20px rgba(79, 195, 255, 0.3);
+  
+  /* 焦点环 */
+  --color-focus-ring: #4fc3ff;
+  --color-focus-shadow: 0 0 0 3px rgba(79, 195, 255, 0.4);
+}
+
+[data-theme="light"] {
+  /* === 浅色主题 === */
+  
+  --color-bg-primary: linear-gradient(180deg, #f0f9ff 0%, #e0f2fe 100%);
+  --color-bg-secondary: rgba(255, 255, 255, 0.95);
+  --color-bg-tertiary: rgba(240, 249, 255, 0.98);
+  --color-bg-panel: #ffffff;
+  --color-bg-hover: rgba(240, 249, 255, 0.8);
+  
+  --color-text-primary: #1a365d;
+  --color-text-secondary: #2d3748;
+  --color-text-muted: #718096;
+  --color-text-disabled: #a0aec0;
+  
+  --color-border-default: #e2e8f0;
+  --color-border-light: #edf2f7;
+  --color-border-focus: #3182ce;
+  
+  --color-primary: #3182ce;
+  --color-success: #38a169;
+  --color-warning: #d69e2e;
+  --color-danger: #e53e3e;
+  --color-info: #319795;
+  
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.08);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.12);
+  --shadow-glow: 0 0 20px rgba(49, 130, 206, 0.15);
+  
+  --color-focus-ring: #3182ce;
+  --color-focus-shadow: 0 0 0 3px rgba(49, 130, 206, 0.3);
+}
+
+/* === 打印样式 === */
+@media print {
+  :root {
+    --color-bg-primary: #ffffff;
+    --color-bg-secondary: #ffffff;
+    --color-bg-panel: #ffffff;
+    
+    --color-text-primary: #000000;
+    --color-text-secondary: #333333;
+    
+    --color-border-default: #cccccc;
+    
+    --shadow-sm: none;
+    --shadow-md: none;
+    --shadow-lg: none;
+    --shadow-glow: none;
+  }
+  
+  body {
+    background: white !important;
+    color: black !important;
+  }
+  
+  /* 隐藏非必要元素 */
+  .skip-link,
+  .no-print,
+  .loading-overlay,
+  .chart-placeholder,
+  [data-hide-print] {
+    display: none !important;
+  }
+  
+  /* 强制显示重要内容 */
+  .show-print,
+  [data-show-print] {
+    display: block !important;
+  }
+  
+  /* 移除背景效果 */
+  .medical-screen,
+  .panel,
+  .stat-card {
+    background: white !important;
+    backdrop-filter: none !important;
+    box-shadow: none !important;
+    border: 1px solid #ccc !important;
+  }
+  
+  /* 确保文字可见 */
+  * {
+    color: black !important;
+    background: transparent !important;
+  }
+  
+  /* 分页控制 */
+  a[href]::after {
+    content: " (" attr(href) ")";
+    font-size: smaller;
+    color: gray;
+  }
+}
+
+// ============================================================================
+// 📐 Section 5: Grid 命名区域模板 (Grid Named Areas Template)
+// ============================================================================
+
+/**
+ * 使用示例：
+ * 
+ * .layout-grid {
+ *   display: grid;
+ *   grid-template-areas:
+ *     "header header header header"
+ *     "stats stats stats stats"
+ *     "left center right"
+ *     "warning warning warning";
+ *   
+ *   grid-template-columns: repeat(4, 1fr);
+ *   grid-template-rows: auto auto 1fr auto;
+ * }
+ * 
+ * .header { grid-area: header; }
+ * .stats { grid-area: stats; }
+ * .left { grid-area: left; }
+ * .center { grid-area: center; }
+ * .right { grid-area: right; }
+ * .warning { grid-area: warning; }
+ */
+
+.layout-medical-screen {
+  display: grid;
+  
+  /* 默认桌面布局命名区域 */
+  grid-template-areas:
+    "header header header header"
+    "stats stats stats stats"
+    "left center right"
+    "warning warning warning";
+  
+  grid-template-columns: repeat(4, 1fr);
+  grid-template-rows: auto auto 1fr auto;
+  gap: var(--grid-gap-lg, 18px);
+  min-height: 100vh;
+  width: 100%;
+  
+  /* 平板竖屏 (<768px) */
+  @media (max-width: 768px) {
+    grid-template-areas:
+      "header"
+      "stats"
+      "center"
+      "left"
+      "right"
+      "warning";
+    
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto 1fr auto auto auto;
+    gap: var(--grid-gap-sm, 12px);
+  }
+  
+  /* 平板横屏 (768px-1024px) */
+  @media (min-width: 769px) and (max-width: 1024px) {
+    grid-template-areas:
+      "header header"
+      "stats stats"
+      "center center"
+      "left right"
+      "warning warning";
+    
+    grid-template-columns: repeat(2, 1fr);
+    grid-template-rows: auto auto 1fr auto auto;
+    gap: var(--grid-gap-md, 16px);
+  }
+  
+  /* 大屏桌面 (≥1920px) */
+  @media (min-width: 1920px) {
+    grid-template-areas:
+      "header header header header"
+      "stats stats stats stats"
+      "left center right"
+      "warning warning warning warning";
+    
+    grid-template-columns: repeat(4, 1fr);
+    grid-template-rows: auto auto 1fr auto;
+    gap: var(--grid-gap-xl, 24px);
+  }
+}
+
+/* 命名区域分配 */
+.grid-header {
+  grid-area: header;
+}
+
+.grid-stats {
+  grid-area: stats;
+}
+
+.grid-left {
+  grid-area: left;
+}
+
+.grid-center {
+  grid-area: center;
+}
+
+.grid-right {
+  grid-area: right;
+}
+
+.grid-warning {
+  grid-area: warning;
+}
+
+// ============================================================================
+// 🔤 Section 6: 间距系统 (Spacing System)
+// ============================================================================
+
+:root {
+  /* 基础间距单位 (Base Unit = 4px) */
+  --space-unit: 4px;
+  
+  /* 间距刻度 (Space Scale) */
+  --space-xs: calc(var(--space-unit) * 1);   // 4px
+  --space-sm: calc(var(--space-unit) * 2);   // 8px
+  --space-md: calc(var(--space-unit) * 3);   // 12px
+  --space-base: calc(var(--space-unit) * 4); // 16px
+  --space-lg: calc(var(--space-unit) * 5);   // 20px
+  --space-xl: calc(var(--space-unit) * 6);   // 24px
+  --space-2xl: calc(var(--space-unit) * 8);  // 32px
+  --space-3xl: calc(var(--space-unit) * 10); // 40px
+  
+  /* 网格间距 */
+  --grid-gap-xs: var(--space-sm);      // 8px
+  --grid-gap-sm: var(--space-md);      // 12px
+  --grid-gap-md: var(--space-base);   // 16px
+  --grid-gap-lg: var(--space-lg);     // 20px
+  --grid-gap-xl: var(--space-xl);     // 24px
+  
+  /* 容器内边距 */
+  --container-padding-xs: var(--space-sm);   // 8px
+  --container-padding-sm: var(--space-md);   // 12px
+  --container-padding-md: var(--space-base); // 16px
+  --container-padding-lg: var(--space-lg);   // 20px
+  --container-padding-xl: var(--space-xl);   // 24px
+  
+  /* 面板尺寸 */
+  --panel-padding-sm: var(--space-sm);    // 8px
+  --panel-padding-md: var(--space-base);  // 16px
+  --panel-padding-lg: var(--space-lg);    // 20px
+  
+  /* 圆角半径 */
+  --radius-sm: calc(var(--space-unit) * 1.5); // 6px
+  --radius-md: calc(var(--space-unit) * 2.5); // 10px
+  --radius-lg: calc(var(--space-unit) * 3.5); // 14px
+  --radius-xl: calc(var(--space-unit) * 5);   // 20px
+  --radius-full: 50%;
+  
+  /* 最小高度 */
+  --min-height-sm: 200px;
+  --min-height-md: 280px;
+  --min-height-lg: 360px;
+  --min-height-xl: 420px;
+  --min-height-2xl: 520px;
+}
+
+// ============================================================================
+// 🖨️ Section 7: 交互状态 (Interactive States)
+// ============================================================================
+
+/**
+ * 交互状态规范：
+ * - Default (默认)
+ * - Hover (悬停)
+ * - Focus (聚焦)
+ * - Active/Pressed (按下)
+ * - Disabled (禁用)
+ * - Loading (加载中)
+ * - Error (错误)
+ * - Success (成功)
+ */
+
+/* 可交互元素基础样式 */
+.interactive-element {
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-md);
+  }
+  
+  &:focus {
+    outline: 2px solid var(--color-focus-ring);
+    outline-offset: 2px;
+  }
+  
+  &:focus:not(:focus-visible) {
+    outline: none;
+  }
+  
+  &:active {
+    transform: translateY(0);
+    box-shadow: var(--shadow-sm);
+  }
+  
+  &[disabled] {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
+    
+    &:hover {
+      transform: none;
+      box-shadow: none;
+    }
+  }
+}
+
+/* 加载状态 */
+.is-loading {
+  position: relative;
+  pointer-events: none;
+  
+  &::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 20px;
+    height: 20px;
+    margin: -10px 0 0 -10px;
+    border: 2px solid var(--color-border-focus);
+    border-top-color: var(--color-primary);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+  }
+}
+
+/* 错误状态 */
+.has-error {
+  border-color: var(--color-danger) !important;
+  box-shadow: 0 0 0 2px rgba(238, 102, 102, 0.2);
+}
+
+/* 成功状态 */
+.has-success {
+  border-color: var(--color-success) !important;
+  box-shadow: 0 0 0 2px rgba(56, 204, 105, 0.2);
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// ============================================================================
+// 📱 Section 8: 断点和响应式工具类 (Breakpoint Utilities)
+// ============================================================================
+
+/**
+ * 断点定义：
+ * --breakpoint-xs:  0 - 479px   (手机小屏)
+ * --breakpoint-sm:  480px - 767px (手机大屏)
+ * --breakpoint-md:  768px - 1023px (平板)
+ * --breakpoint-lg:  1024px - 1365px (小屏桌面)
+ * --breakpoint-xl:  1366px - 1919px (标准桌面)
+ * --breakpoint-2xl: 1920px - 2559px (大屏/2K)
+ * --breakpoint-3xl: 2560px+        (超大屏/4K)
+ */
+
+:root {
+  --breakpoint-xs: 480px;
+  --breakpoint-sm: 768px;
+  --breakpoint-md: 1024px;
+  --breakpoint-lg: 1366px;
+  --breakpoint-xl: 1920px;
+  --breakpoint-2xl: 2560px;
+}
+
+/* 显示/隐藏工具类 */
+.show-xs { display: none !important; }
+.show-sm { display: none !important; }
+.show-md { display: none !important; }
+.show-lg { display: none !important; }
+.show-xl { display: none !important; }
+
+.hide-xs { display: block !important; }
+.hide-sm { display: block !important; }
+.hide-md { display: block !important; }
+.hide-lg { display: block !important; }
+.hide-xl { display: block !important; }
+
+@media (min-width: 480px) {
+  .show-sm { display: block !important; }
+  .hide-sm { display: none !important; }
+}
+
+@media (min-width: 768px) {
+  .show-md { display: block !important; }
+  .hide-md { display: none !important; }
+}
+
+@media (min-width: 1024px) {
+  .show-lg { display: block !important; }
+  .hide-lg { display: none !important; }
+}
+
+@media (min-width: 1366px) {
+  .show-xl { display: block !important; }
+  .hide-xl { display: none !important; }
+}
+
+/* 仅在对应断点显示的类 */
+.visible-xs-block { display: none !important; }
+.visible-xs-inline { display: none !important; }
+.visible-xs-flex { display: none !important; }
+
+@media (max-width: 479px) {
+  .visible-xs-block { display: block !important; }
+  .visible-xs-inline { display: inline-block !important; }
+  .visible-xs-flex { display: flex !important; }
+}
