@@ -218,29 +218,58 @@ const headerLogin = () => {
           user
         });
 
-        // 先跳转，避免被后续异步流程拖慢页面切换感知
-        const redirectPath = typeof router.currentRoute.value.query?.redirect === 'string'
-          ? router.currentRoute.value.query.redirect
-          : '/';
-        router.replace(redirectPath).catch((err) => {
-          // 避免重复导航报错影响后续逻辑
-          console.warn('登录后跳转失败:', err);
-        });
-
-        // 异步加载权限和菜单，不阻塞跳转
-        setTimeout(async () => {
-          try {
-            await loadAll();
-          } catch (e) {
-            console.warn('loadAll失败，不影响跳转:', e);
+        // 加载菜单数据，然后根据菜单列表的第一个菜单路由进行跳转
+        try {
+          await loadAll();
+          await menuStore.FETCH_MENUS();
+          
+          // 计算跳转路径
+          let redirectPath = null;
+          
+          // 检查是否有 redirect 参数
+          if (typeof router.currentRoute.value.query?.redirect === 'string') {
+            redirectPath = router.currentRoute.value.query.redirect;
+          } else {
+            // 没有 redirect 参数，使用菜单列表的第一个菜单路由
+            const menus = menuStore.menuTree || [];
+            if (menus.length > 0) {
+              // 找到第一个有路径的菜单
+              const findFirstMenuWithPath = (menuList) => {
+                for (const menu of menuList) {
+                  if (menu.path && menu.path !== '/') {
+                    return menu.path;
+                  }
+                  if (menu.children && menu.children.length > 0) {
+                    const childPath = findFirstMenuWithPath(menu.children);
+                    if (childPath) {
+                      return childPath;
+                    }
+                  }
+                }
+                return null;
+              };
+              
+              const firstMenuPath = findFirstMenuWithPath(menus);
+              if (firstMenuPath) {
+                redirectPath = firstMenuPath;
+              }
+            }
           }
-
-          try {
-            await menuStore.FETCH_MENUS();
-          } catch (e) {
-            console.warn('加载菜单失败，不影响跳转:', e);
+          
+          // 执行跳转
+          if (redirectPath) {
+            router.replace(redirectPath).catch((err) => {
+              console.warn('登录后跳转失败:', err);
+              // 跳转失败时，不默认跳转到首页，保持当前状态
+            });
+          } else {
+            console.warn('未找到可跳转的菜单，保持当前状态');
+            // 未找到可跳转的菜单，保持当前状态
           }
-        }, 100);
+        } catch (e) {
+          console.warn('加载菜单失败，保持当前状态:', e);
+          // 加载菜单失败时，不默认跳转到首页，保持当前状态
+        }
 
         return res;
       }

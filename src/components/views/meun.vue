@@ -12,14 +12,32 @@
 <script setup lang="ts">
 import { ref, h, computed, watch, onMounted, onBeforeUnmount } from 'vue';
 import {
-  HomeOutlined,
-  SettingOutlined,
-  TeamOutlined,
+  FundOutlined,
+  UserOutlined,
+  UserAddOutlined,
+  UserDeleteOutlined,
+  QuestionCircleOutlined,
+  MenuOutlined,
   DatabaseOutlined,
+  SettingOutlined,
+  LockOutlined,
+  TeamOutlined,
+  HomeOutlined,
   BarChartOutlined,
   UnorderedListOutlined,
-  CloudServerOutlined
+  DashboardOutlined,
+  PlusOutlined,
+  SafetyCertificateOutlined,
+  BookOutlined,
+  CloudServerOutlined,
+  UserSwitchOutlined,
+  FileTextOutlined,
+  MenuFoldOutlined,
+  MenuUnfoldOutlined,
+  AppstoreOutlined,
+  ApiOutlined
 } from '@ant-design/icons-vue';
+
 import { useRoute, useRouter } from 'vue-router';
 import { useMenuStore } from '../../stores/menu';
 import { useAuthStore } from '../../stores/auth';
@@ -55,55 +73,6 @@ const STATIC_MENU_ITEMS = [
     icon: () => h(HomeOutlined),
     path: '/'
   },
-  {
-    key: '/user/home',
-    label: '用户首页',
-    title: '用户首页',
-    icon: () => h(HomeOutlined),
-    path: '/user/home'
-  },
-  {
-    key: '/admin/home',
-    label: '管理首页',
-    title: '管理首页',
-    icon: () => h(SettingOutlined),
-    path: '/admin/home'
-  },
-  {
-    key: '/user/manage',
-    label: '用户管理',
-    title: '用户管理',
-    icon: () => h(TeamOutlined),
-    path: '/user/manage/list'
-  },
-  {
-    key: '/admin/settings/menus',
-    label: '菜单列表',
-    title: '菜单列表',
-    icon: () => h(SettingOutlined),
-    path: '/admin/settings/menus'
-  },
-  {
-    key: '/admin/settings',
-    label: '权限管理',
-    title: '权限管理',
-    icon: () => h(SettingOutlined),
-    path: '/admin/settings/menu-permission'
-  },
-  {
-    key: '/database/manage',
-    label: '数据源管理',
-    title: '数据源管理',
-    icon: () => h(DatabaseOutlined),
-    path: '/database/manage'
-  },
-  {
-    key: '/cluster/manage',
-    label: '集群管理',
-    title: '集群管理',
-    icon: () => h(CloudServerOutlined),
-    path: '/cluster/manage'
-  }
 ];
 
 const ICON_MAP: Record<string, any> = {
@@ -113,8 +82,60 @@ const ICON_MAP: Record<string, any> = {
   'DatabaseOutlined': icon(DatabaseOutlined),
   'BarChartOutlined': icon(BarChartOutlined),
   'UnorderedListOutlined': icon(UnorderedListOutlined),
-  'CloudServerOutlined': icon(CloudServerOutlined)
+  'CloudServerOutlined': icon(CloudServerOutlined),
+  'UserOutlined': icon(UserOutlined),
+  'UserAddOutlined': icon(UserAddOutlined),
+  'UserDeleteOutlined': icon(UserDeleteOutlined),
+  'QuestionCircleOutlined': icon(QuestionCircleOutlined),
+  'MenuOutlined': icon(MenuOutlined),
+  'LockOutlined': icon(LockOutlined),
+  'DashboardOutlined': icon(DashboardOutlined),
+  'PlusOutlined': icon(PlusOutlined),
+  'SafetyCertificateOutlined': icon(SafetyCertificateOutlined),
+  'BookOutlined': icon(BookOutlined),
+  'UserSwitchOutlined': icon(UserSwitchOutlined),
+  'FileTextOutlined': icon(FileTextOutlined),
+  'MenuFoldOutlined': icon(MenuFoldOutlined),
+  'MenuUnfoldOutlined': icon(MenuUnfoldOutlined),
+  'AppstoreOutlined': icon(AppstoreOutlined),
+  'ApiOutlined': icon(ApiOutlined)
 };
+
+// 根据菜单名称自动匹配图标
+function getIconByMenuName(menuName: string) {
+  const nameLower = menuName.toLowerCase();
+  
+  if (nameLower.includes('首页')) return icon(HomeOutlined);
+  if (nameLower.includes('用户')) {
+    if (nameLower.includes('管理')) return icon(TeamOutlined);
+    if (nameLower.includes('新增') || nameLower.includes('添加')) return icon(UserAddOutlined);
+    if (nameLower.includes('授权')) return icon(UserSwitchOutlined);
+    if (nameLower.includes('详情')) return icon(UserOutlined);
+    return icon(UserOutlined);
+  }
+  if (nameLower.includes('菜单')) {
+    if (nameLower.includes('树')) return icon(MenuOutlined);
+    return icon(MenuOutlined);
+  }
+  if (nameLower.includes('权限')) return icon(LockOutlined);
+  if (nameLower.includes('数据') || nameLower.includes('库')) {
+    if (nameLower.includes('管理')) return icon(DatabaseOutlined);
+    if (nameLower.includes('安全')) return icon(DatabaseOutlined);
+    return icon(DatabaseOutlined);
+  }
+  if (nameLower.includes('集群')) return icon(CloudServerOutlined);
+  if (nameLower.includes('分析') || nameLower.includes('统计')) {
+    if (nameLower.includes('数据')) return icon(BarChartOutlined);
+    return icon(BarChartOutlined);
+  }
+  if (nameLower.includes('设置') || nameLower.includes('配置')) return icon(SettingOutlined);
+  if (nameLower.includes('列表')) return icon(UnorderedListOutlined);
+  if (nameLower.includes('文档') || nameLower.includes('文件')) return icon(FileTextOutlined);
+  if (nameLower.includes('应用') || nameLower.includes('平台')) return icon(AppstoreOutlined);
+  if (nameLower.includes('API') || nameLower.includes('接口')) return icon(ApiOutlined);
+  
+  return null;
+}
 
 function convertApiMenu(apiMenu) {
   if (!apiMenu) return null;
@@ -134,6 +155,12 @@ function convertApiMenu(apiMenu) {
       item.icon = apiMenu.icon;
     } else if (ICON_MAP[apiMenu.icon]) {
       item.icon = ICON_MAP[apiMenu.icon];
+    }
+  } else {
+    // 没有指定图标，根据菜单名称自动匹配
+    const autoIcon = getIconByMenuName(item.label);
+    if (autoIcon) {
+      item.icon = autoIcon;
     }
   }
 
@@ -490,6 +517,38 @@ defineExpose({ rebuildMenu });
 .user_menu :deep(.ant-menu-item-selected) {
   background: linear-gradient(135deg, #e6f7ff, #f0f5ff);
   border-radius: 6px;
+  color: #1890ff;
+}
+.user_menu :deep(.ant-menu-submenu-title) {
+  padding: 0 20px;
+  font-size: 15px;
+  transition: all 0.3s ease;
+}
+.user_menu :deep(.ant-menu-submenu-title:hover) {
+  background: linear-gradient(135deg, #e6f7ff, #f0f5ff);
+  border-radius: 6px;
+  color: #1890ff;
+}
+.user_menu :deep(.ant-menu-sub) {
+  background: white !important;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  padding: 4px 0;
+  margin-top: 4px;
+}
+.user_menu :deep(.ant-menu-submenu-popup) {
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+.user_menu :deep(.ant-menu-sub .ant-menu-item) {
+  padding: 8px 20px;
+  font-size: 14px;
+  margin: 2px 8px;
+  border-radius: 6px;
+}
+.user_menu :deep(.ant-menu-sub .ant-menu-item:hover),
+.user_menu :deep(.ant-menu-sub .ant-menu-item-selected) {
+  background: linear-gradient(135deg, #e6f7ff, #f0f5ff);
   color: #1890ff;
 }
 /* 调整树节点开关图标的位置 */

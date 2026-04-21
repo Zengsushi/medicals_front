@@ -284,10 +284,7 @@ let resourceChart: echarts.ECharts | null = null;
 const userInfo = computed(() => authStore.currentUser);
 
 const systemStatus = reactive<SystemStatus[]>([
-  { label: 'API服务', status: 'online' },
-  { label: '数据库', status: 'online' },
-  { label: '缓存服务', status: 'online' },
-  { label: '文件存储', status: 'warning' }
+
 ]);
 
 const metricsData = reactive<MetricData[]>([
@@ -295,7 +292,7 @@ const metricsData = reactive<MetricData[]>([
     title: '总用户数',
     value: 0,
     icon: TeamOutlined,
-    gradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+    gradient: '#667eea',
     color: '#667eea',
     trend: 0,
     path: '/user/manage'
@@ -304,7 +301,7 @@ const metricsData = reactive<MetricData[]>([
     title: '今日活跃',
     value: 0,
     icon: BarChartOutlined,
-    gradient: 'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+    gradient: '#f5576c',
     color: '#f5576c',
     trend: 0,
     path: '/visual/large'
@@ -313,7 +310,7 @@ const metricsData = reactive<MetricData[]>([
     title: '数据记录',
     value: 0,
     icon: DatabaseOutlined,
-    gradient: 'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+    gradient: '#00f2fe',
     color: '#00f2fe',
     trend: 0,
     path: '/database/manage'
@@ -322,7 +319,7 @@ const metricsData = reactive<MetricData[]>([
     title: '系统告警',
     value: 0,
     icon: SafetyCertificateOutlined,
-    gradient: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
+    gradient: '#fa709a',
     color: '#fa709a',
     trend: 0,
     path: '/admin/settings/menus'
@@ -331,19 +328,11 @@ const metricsData = reactive<MetricData[]>([
 
 const quickOperations = reactive<QuickOperation[]>([
   {
-    key: 'addUser',
-    label: '添加用户',
-    desc: '创建新的系统用户账号',
-    icon: PlusCircleOutlined,
-    color: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-    path: '/user/manage/add'
-  },
-  {
     key: 'manageUsers',
     label: '用户管理',
     desc: '管理系统用户和权限',
     icon: TeamOutlined,
-    color: 'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
+    color: '#43e97b',
     path: '/user/manage/list'
   },
   {
@@ -351,7 +340,7 @@ const quickOperations = reactive<QuickOperation[]>([
     label: '菜单配置',
     desc: '管理系统菜单和权限',
     icon: SettingOutlined,
-    color: 'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
+    color: '#fa709a',
     path: '/admin/settings/menus'
   },
   {
@@ -359,24 +348,8 @@ const quickOperations = reactive<QuickOperation[]>([
     label: '数据源管理',
     desc: '配置和管理数据源连接',
     icon: DatabaseOutlined,
-    color: 'linear-gradient(135deg, #30cfd0 0%, #330867 100%)',
+    color: '#30cfd0',
     path: '/database/manage'
-  },
-  {
-    key: 'exportData',
-    label: '导出报表',
-    desc: '导出数据和统计报表',
-    icon: ExportOutlined,
-    color: 'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)',
-    path: null
-  },
-  {
-    key: 'sysMonitor',
-    label: '系统监控',
-    desc: '监控系统运行状态',
-    icon: MonitorOutlined,
-    color: 'linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%)',
-    path: '/visual/large'
   }
 ]);
 
@@ -613,25 +586,19 @@ const initActivityChart = async () => {
       splitLine: { lineStyle: { color: '#f0f0f0', type: 'dashed' } }
     },
     series: [{
-      type: 'bar',
-      barWidth: '50%',
-      data: chartData.values,
+    type: 'bar',
+    barWidth: '50%',
+    data: chartData.values,
+    itemStyle: {
+      borderRadius: [8, 8, 0, 0],
+      color: '#667eea'
+    },
+    emphasis: {
       itemStyle: {
-        borderRadius: [8, 8, 0, 0],
-        color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-          { offset: 0, color: '#667eea' },
-          { offset: 1, color: '#764ba2' }
-        ])
-      },
-      emphasis: {
-        itemStyle: {
-          color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-            { offset: 0, color: '#764ba2' },
-            { offset: 1, color: '#667eea' }
-          ])
-        }
+        color: '#513cc9'
       }
-    }]
+    }
+  }]
   };
 
   activityChart.setOption(option);
@@ -799,7 +766,7 @@ onUnmounted(() => {
 .admin-home {
   min-height: calc(100vh - 140px);
   padding: 24px;
-  background: linear-gradient(180deg, #f9fbff 0%, #eef3ff 100%);
+  background: #f8f9fa;
 }
 
 .admin-container {
@@ -813,7 +780,7 @@ onUnmounted(() => {
 
 .admin-welcome-card {
   border-radius: 12px;
-  box-shadow: 0 2px 12px rgba(102, 126, 234, 0.08);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
   height: 100%;
 
   .ant-card-body {
@@ -833,6 +800,7 @@ onUnmounted(() => {
 
 .admin-avatar {
   box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+  background: #667eea !important;
 }
 
 .welcome-text {
@@ -842,10 +810,7 @@ onUnmounted(() => {
     font-size: 26px;
     font-weight: 700;
     margin: 0 0 8px 0;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
+    color: #333;
   }
 
   .welcome-desc {
@@ -1012,7 +977,7 @@ onUnmounted(() => {
 
 .todo-card {
   :deep(.ant-card-head) {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: #667eea;
     border-radius: 12px 12px 0 0;
     padding: 16px 20px;
     
@@ -1045,7 +1010,7 @@ onUnmounted(() => {
     }
     
     &:hover {
-      background: linear-gradient(135deg, #f9fbff 0%, #f0f5ff 100%);
+      background: #f8f9fa;
     }
   }
   
@@ -1079,13 +1044,13 @@ onUnmounted(() => {
     height: auto;
     font-size: 13px;
     color: #667eea;
-    background: linear-gradient(135deg, rgba(102, 126, 234, 0.1) 0%, rgba(118, 75, 162, 0.1) 100%);
+    background: rgba(102, 126, 234, 0.1);
     border-radius: 6px;
     transition: all 0.3s ease;
     
     &:hover {
       color: #513cc9;
-      background: linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.2) 100%);
+      background: rgba(102, 126, 234, 0.2);
       transform: translateY(-1px);
     }
   }
@@ -1108,7 +1073,7 @@ onUnmounted(() => {
   border: 1px solid transparent;
 
   &:hover {
-    background: linear-gradient(135deg, #f9fbff 0%, #f0f5ff 100%);
+    background: #f8f9fa;
     border-color: #d6e4ff;
     transform: translateX(4px);
   }
